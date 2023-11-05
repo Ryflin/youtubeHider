@@ -1,2 +1,10 @@
-const xhr = new XMLHttpRequest();
-var searchBarInfo = document.getElementById('searchBar');
+function getSearch() {
+  const searchBarText = document.getElementById("searchBar").value;
+  console.log(searchBarText);
+  extractYouTubeVideoIDs();
+}
+function extractYouTubeVideoIDs() {
+ 
+}
+
+
