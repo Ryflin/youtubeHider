@@ -140,7 +140,7 @@ public final class Main {
     // Finally we have the response
     return htmlContent;
   }
-  Desktop.getDesktop().browse(file.toURI());
+  
   static String[] removeDuplicates(String str[]) {
     System.out.println(str.length);
     String[] str2 = new String[str.length];
