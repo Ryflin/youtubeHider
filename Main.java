@@ -86,7 +86,6 @@ public final class Main {
       file.createNewFile();
       FileWriter writer = new FileWriter(filename);
       writer.write(input);
-      Desktop.getDesktop().browse(file.toURI());
       writer.close();
 
     } catch (IOException e) {
