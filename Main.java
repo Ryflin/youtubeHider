@@ -140,14 +140,14 @@ public final class Main {
     // Finally we have the response
     return htmlContent;
   }
-
+  Desktop.getDesktop().browse(file.toURI());
   static String[] removeDuplicates(String str[]) {
     System.out.println(str.length);
     String[] str2 = new String[str.length];
     int k = 0;
     String uniVal = "";
     for (int i = 0; i < str.length; i++) {
-      if (!uniVal.equals(str[i])) {
+      if (uniVal != null && !uniVal.equals(str[i])) {
         uniVal = str[i];
         str2[k] = str[i];
         k++;
