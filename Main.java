@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,10 +12,11 @@ import java.util.regex.Pattern;
 import java.awt.Desktop;
 
 public final class Main {
-  public static final int MaxVids = 10;
+
+  private static int maxVids;
+
   private static void makeHtml(String request) {
     String fileInput = "<!DOCTYPE html>\n" + //
-        "\n" + //
         "<head>\n" + //
         "  <title>\n" + //
         "    MY YOUTUBE\n" + //
@@ -33,31 +35,25 @@ public final class Main {
         "      margin-bottom: 25px;\n" + //
         "      }\n" + //
         "  </style>\n" + //
-        "  \n" + //
-        "</head>";
+        "</head>\n" + //
+        "<body>\n" + //
+        "  <h1>" + request + "</h1>\n";
     System.out.print(request);
     String responses = serverRequest2(request);
     // System.out.println(responses);
     String[] ytId = getYoutubeIds(responses);
     // System.out.println();
     String[] newytId = removeDuplicates(ytId);
-    for (int i = 0; i < newytId.length && i < MaxVids; i++) {
+    for (int i = 0; i < newytId.length && i < maxVids; i++) {
       System.out.println(newytId[i]);
-      fileInput += "<iframe src=\"" + newytId[i]
-          + "\" class=\"youtube-player\" allowfullscreen=\"\" scrolling=\"no\" allow=\"encrypted-media\"></iframe>";
+      if (newytId[i] != null) {
+        fileInput += "<iframe src=\"" + newytId[i]
+            + "\" class=\"youtube-player\" allowfullscreen=\"\" scrolling=\"no\" allow=\"encrypted-media\"></iframe>\n";
+      }
     }
+    fileInput += "</body>";
+    fileWrite("html/index.html", fileInput);
     File file = new File("html/index.html");
-    try {
-      file.createNewFile();
-      FileWriter writer = new FileWriter("html/index.html");
-      writer.write(fileInput);
-      Desktop.getDesktop().browse(file.toURI());
-      writer.close();
-
-    } catch (IOException e) {
-      System.err.println("Yeah, I don't know why that happened. The file failed to write properly.");
-      e.printStackTrace();
-    }
     try {
       Desktop.getDesktop().browse(file.toURI());
     } catch (IOException e) {
@@ -65,8 +61,9 @@ public final class Main {
       e.printStackTrace();
     }
   }
+
   private static String[] getYoutubeIds(String responses) {
-    String[] ytId = new String[100];
+    String[] ytId = new String[maxVids * 10];
     // Regular expression pattern to match YouTube video IDs
     String pattern = "\"videoId\":\"([a-zA-Z0-9_-]{11})\"";
     Pattern compiledPattern = Pattern.compile(pattern);
@@ -74,7 +71,7 @@ public final class Main {
     // Use Matcher to find all matches in the HTML content
     Matcher matcher = compiledPattern.matcher(responses);
     int j = 0;
-    while (j < 100 && matcher.find()) {
+    while (j < maxVids * 10 && matcher.find()) {
       ytId[j] = "https://www.youtube.com/embed/" + matcher.group(1);
       // System.out.print(ytId[j] + " ");
       // System.out.println(responses[j]);
@@ -83,36 +80,44 @@ public final class Main {
     return ytId;
   }
 
-  /*
-   * private static String serverRequest(String Request) {
-   * try {
-   * YouTube youtube = new YouTube.Builder(Auth.HTTP_TRANSPORT, Auth.JSON_FACTORY,
-   * null)
-   * .setApplicationName("YouTubeSearch")
-   * .build();
-   * 
-   * String apiKey = "YOUR_API_KEY"; // Replace with your API key
-   * String query = "dogs";
-   * long maxResults = 25;
-   * 
-   * YouTube.Search.List search = youtube.search().list("id,snippet");
-   * search.setKey(apiKey);
-   * search.setQ(query);
-   * search.setMaxResults(maxResults);
-   * 
-   * SearchListResponse searchResponse = search.execute();
-   * List<SearchResult> searchResults = searchResponse.getItems();
-   * 
-   * for (SearchResult searchResult : searchResults) {
-   * System.out.println("Video ID: " + searchResult.getId().getVideoId());
-   * System.out.println("Title: " + searchResult.getSnippet().getTitle());
-   * }
-   * } catch (IOException e) {
-   * e.printStackTrace();
-   * }
-   * return "";
-   * }
-   */
+  private static void fileWrite(String filename, String input) {
+    File file = new File(filename);
+    try {
+      file.createNewFile();
+      FileWriter writer = new FileWriter(filename);
+      writer.write(input);
+      Desktop.getDesktop().browse(file.toURI());
+      writer.close();
+
+    } catch (IOException e) {
+      System.err.println("Yeah, I don't know why that happened. The file failed to write properly.");
+      e.printStackTrace();
+    }
+  }
+
+  private static String fileRead(String filename) {
+    try {
+      File file = new File(filename);
+      FileInputStream fileInputStream = new FileInputStream(file);
+      Scanner in = new Scanner(fileInputStream);
+
+      if (in.hasNextLine()) {
+        String input = in.nextLine();
+        in.close();
+        return input;
+      } else {
+        // Handle the case where the file is empty
+        in.close();
+        return "";
+      }
+    } catch (Exception e) {
+      System.out.println("Sry, can't seem to read the file" + filename
+          + " if you wouldn't mind checkind that it exists that would be great.");
+      e.printStackTrace();
+      return "";
+    }
+  }
+
   private static String serverRequest2(String Request) {
     System.out.print("Request: ");
     String newRequest = Request.replace(' ', '+');
@@ -152,35 +157,30 @@ public final class Main {
     return str2;
   }
 
-  /*
-   * private static String processRequest2 (String request) {
-   * String response = "";
-   * try {
-   * HttpURLConnection connection = (HttpURLConnection) new
-   * URL("https://www.youtube.com/").openConnection();
-   * InputStream straem = connection.getInputStream();
-   * try (Scanner scanner = new Scanner(straem,
-   * StandardCharsets.UTF_8).useDelimiter("\\A")) {
-   * response = scanner.hasNext() ? scanner.next() : "";
-   * }
-   * } catch (IOException e) {
-   * System.out.println("Yeah not a lot going on here");
-   * e.printStackTrace();
-   * }
-   * return response;
-   * This one was done for my learning
-   * }
-   */
   public static void main(String[] args) {
-
+    String vidString = fileRead("preferences/maxVids.txt");
+    maxVids = Integer.parseInt(vidString);
     Scanner in = new Scanner(System.in);
-    System.out.print("What would you like to search? ");
-    String input = in.nextLine();
+    String input;
 
-    if (input != null && input.charAt(0) == '/') {
-      makeHtml(input);
-    } else {
+    do {
+      System.out.print("What would you like to search? ");
+      input = in.nextLine();
+      if (input != null && !input.isEmpty()) {
+        if (input.charAt(0) != '/') {
+          makeHtml(input);
+        } else {
+          if (input.equals("/vidNum")) {
+            System.out.print("How many videos would you like to see per page? ");
+            int num = in.nextInt();
+            fileWrite("preferences/maxVids.txt", String.valueOf(num));
+          } else {
+            System.out.println("Sorry, I don't know that command yet");
+          }
+        }
+      }
+    } while (input != null && input != "");
 
-    }
+    in.close();
   }
 }
