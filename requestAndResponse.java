@@ -1,7 +1,5 @@
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -56,14 +54,18 @@ public final class requestAndResponse {
             }
         }
         fileInput += "</body>";
-        fileWrite("index.html", fileInput);
+        fileMan.out("index.html", fileInput);
         File file = new File("index.html");
         try {
             Desktop.getDesktop().browse(file.toURI());
         } catch (IOException e) {
             System.out.println(
-                    "So... kinda awkward but I can't seemm to open the file I just wrote to...");
-            e.printStackTrace();
+                    "So... kinda awkward but I can't seemm to open the index.html file that I just wrote to...");
+            StringBuilder sb = new StringBuilder(file.getAbsolutePath());
+            sb.deleteCharAt(2);
+            String newFilePath = sb.toString();
+            System.out.println(
+                    "You can try openning it this way: file://" + newFilePath);
         }
     }
 
@@ -83,48 +85,6 @@ public final class requestAndResponse {
             j++;
         }
         return ytId;
-    }
-
-    private static void fileWrite(String filename, String input) {
-        File file = new File(filename);
-        try {
-            file.createNewFile();
-            FileWriter writer = new FileWriter(filename);
-            writer.write(input);
-            writer.close();
-
-        } catch (IOException e) {
-            System.err.println(
-                    "Yeah, I don't know why that happened. The file failed to write properly.");
-            e.printStackTrace();
-        }
-    }
-
-    private static String fileRead(String filename) {
-        try {
-            File file = new File(filename);
-            if (!file.exists()) {
-                file.createNewFile();
-                fileWrite(filename, "10");
-            }
-            FileInputStream fileInputStream = new FileInputStream(file);
-            Scanner in = new Scanner(fileInputStream);
-
-            if (in.hasNextLine()) {
-                String input = in.nextLine();
-                in.close();
-                return input;
-            } else {
-                // Handle the case where the file is empty
-                in.close();
-                return "";
-            }
-        } catch (Exception e) {
-            System.out.println("Sry, can't seem to read the file " + filename
-                    + " if you wouldn't mind checkind that it exists that would be great.");
-            e.printStackTrace();
-            return "";
-        }
     }
 
     private static String serverRequest2(String Request) {
@@ -171,7 +131,7 @@ public final class requestAndResponse {
 
     public static void main(String[] args) {
         search = "results?search_query=";
-        String vidString = fileRead("maxVids.txt");
+        String vidString = fileMan.in("maxVids.txt");
         maxVids = Integer.parseInt(vidString);
         Scanner in = new Scanner(System.in);
         String input;
@@ -187,7 +147,8 @@ public final class requestAndResponse {
                         System.out.print(
                                 "How many videos would you like to see per page? ");
                         int num = in.nextInt();
-                        fileWrite("maxVids.txt", String.valueOf(num));
+                        fileMan.out("maxVids.txt", String.valueOf(num));
+                        input = "";
                     } else if (input.equals("/channel")) {
                         System.out.print(
                                 "What channel would you like to search? ");
