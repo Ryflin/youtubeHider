@@ -9,7 +9,7 @@ Though no data is collected, the site is only under the security preview of http
 There are currently 3 commands availible to users: search, channel, and vidNum;
 Search is the default command. It calles youtube's search function. 
 
-/channel this searches channels by name and displays
+/channel this searches channels by name and displays all the videos on a channel (limited by maxVids.txt)
 
 # for ben for stuff to do
 Basically, I have the main code to create the page done. The changes would include making a better html format that gets hardcodede into the java code. In addition if you created a css file that could be linked to the java doc. 
