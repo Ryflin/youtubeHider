@@ -6,8 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class requestAndResponse {
 
@@ -42,9 +40,7 @@ public final class requestAndResponse {
                 "  <h1>" + request + "</h1>\n";
         System.out.println("Fetching request: " + request);
         String responses = serverRequest2(request);
-        // System.out.println(responses);
         String[] ytId = getYoutubeIds(responses);
-        // System.out.println();
         String[] newytId = removeDuplicates(ytId);
         for (int i = 0; i < newytId.length && i < maxVids; i++) {
             //System.out.println(newytId[i]);
@@ -71,19 +67,25 @@ public final class requestAndResponse {
 
     private static String[] getYoutubeIds(String responses) {
         String[] ytId = new String[maxVids * 10];
+        String[] ttl = new String[maxVids * 10];
         // Regular expression pattern to match YouTube video IDs
-        String pattern = "\"videoId\":\"([a-zA-Z0-9_-]{11})\"";
-        Pattern compiledPattern = Pattern.compile(pattern);
-
-        // Use Matcher to find all matches in the HTML content
-        Matcher matcher = compiledPattern.matcher(responses);
-        int j = 0;
-        while (j < maxVids * 10 && matcher.find()) {
-            ytId[j] = "https://www.youtube.com/embed/" + matcher.group(1);
-            // System.out.print(ytId[j] + " ");
-            // System.out.println(responses[j]);
-            j++;
+        String nr = responses;
+        String pattern = "\"videoId\":\"";
+        int si = pattern.length();
+        int i = 0;
+        while (nr.length() > 0 && nr.indexOf(pattern) > 0 && i < maxVids * 10) {
+            nr = nr.substring(nr.indexOf(pattern) + si);
+            ytId[i] = "https://www.youtube.com/embed/" + nr.substring(0, 11);
+            i++;
         }
+        // pattern = "";
+        // i = 0;
+        // nr = responses;
+        //         while (nr.length() > 0 && nr.indexOf(pattern) > 0 && i < maxVids * 10) {
+        //     nr = nr.substring(nr.indexOf(pattern) + si);
+        //     ytId[i] = "https://www.youtube.com/embed/" + nr.substring(0, 11);
+        //     i++;
+        // }
         return ytId;
     }
 
