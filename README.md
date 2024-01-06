@@ -9,7 +9,7 @@ Though no data is collected, the site is only under the security preview of http
 There are currently 3 commands availible to users: search, channel, and vidNum;
 Search is the default command. It calles youtube's search function. 
 
-/channel searches channels by name and displays all the videos on a channel (limited by maxVids.txt)
+/channel searches channels by name (this is the exact channel name, found on the channel page as @*******) and displays all the videos on a channel (limited by maxVids.txt)
 
 /vidNum allows the user to change the maximum number of videos displayed per page
 
