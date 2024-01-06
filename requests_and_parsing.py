@@ -1,3 +1,4 @@
+#Serves as a testing platform to test the get requests in an easier enviroment
 import requests as rs
 import json as js
 import re
